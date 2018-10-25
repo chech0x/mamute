@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mamute
+  labels:
+    app: mamute
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mamute
+  template:
+    metadata:
+      labels:
+        app: mamute
+    spec:
+      containers:
+        - name : mamute-app
+          image: gcr.io/kvz-ci-sion/mamute-kvz:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: 127.0.0.1:3306/mamute
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mamute.credentials
+                  key: user
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mamute.credentials
+                  key: password
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.11
+          command: ["/cloud_sql_proxy",
+                        "-instances=kvz-ci-sion:us-east1:kvz-ci-sion-db-mamute=tcp:3306",
+                        "-credential_file=/secrets/cloudsql/credentials.json"]
+          securityContext:
+            runAsUser: 2 # non-root user
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: mamute.cloudsql-instance-credentials

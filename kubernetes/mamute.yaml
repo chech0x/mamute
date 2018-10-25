@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mamute
+  labels:
+    app: mamute
+spec:
+  containers:
+  - name: mamute
+    image: gcr.io/kvz-ci-sion/mamute-kvz:latest
+    ports:
+      - containerPort: 8080
+    volumeMounts:
+      - name: secrets
+        mountPath: "/etc/secrets/"
+#    - name: db-user
+#      mountPath: "/run/secrets/db_user"
+#    - name: db-password
+#      mountPath: "/run/secrets/db_password"
+#    - name: db-instance
+#      mountPath: "/run/secrets/db_host_and_instance"
+  volumes:
+    - name: secrets
+      secret:
+        secretName: mamute.credentials
+        defaultMode: 256
+#  - name: db-user
+#    secret:
+#      secretName: mamute.credentials
+#      items:
+#      - key: user
+#        path: .
+#        mode: 511
+#  - name: db-password
+#    secret:
+#      secretName: mamute.credentials
+#      items:
+#      - key: password
+#        path: .
+#        mode: 511
+#  - name: db-instance
+#    secret:
+#      secretName: mamute.credentials
+#      items:
+#      - key: instance
+#        path: .
+#        mode: 511
