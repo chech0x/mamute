@@ -8,9 +8,13 @@ ARG VERSION=1.5.0
 RUN mkdir /mamute
 WORKDIR /mamute
 
-RUN wget -nv https://github.com/caelum/mamute/releases/download/v${VERSION}/mamute-${VERSION}.war && \
-    unzip mamute-${VERSION}.war && \
-    rm mamute-${VERSION}.war
+ADD mamute-${VERSION}.war /mamute/
+
+#RUN wget -nv https://github.com/caelum/mamute/releases/download/v${VERSION}/mamute-${VERSION}.war && \
+#    unzip mamute-${VERSION}.war && \
+#    rm mamute-${VERSION}.war
+RUN  unzip mamute-${VERSION}.war && \
+ rm mamute-${VERSION}.war
 
 ADD ./production.properties /mamute/WEB-INF/classes/production.properties
 ADD ./init.sh /mamute/init.sh
