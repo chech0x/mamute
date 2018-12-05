@@ -1,15 +1,21 @@
 package org.mamute.auth;
 
+import java.util.Random;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.mamute.qualifiers.Facebook;
 import org.mamute.qualifiers.Google;
-import org.scribe.builder.ServiceBuilder;
+import com.github.scribejava.apis.GoogleApi20;
+import com.github.scribejava.apis.FacebookApi;
+/*import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.FacebookApi;
 import org.scribe.builder.api.Google2Api;
-import org.scribe.oauth.OAuthService;
+import org.scribe.oauth.OAuthService;*/
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.oauth.OAuth20Service;
 
 import br.com.caelum.vraptor.environment.Environment;
 public class OAuthServiceCreator {
@@ -22,7 +28,7 @@ public class OAuthServiceCreator {
 	private static final String GOOGLE_CLIENT_SECRET = "google.client_secret";
 	private static final String GOOGLE_REDIRECT_URI = "google.redirect_uri";
 	
-	private OAuthService service;
+	private OAuth20Service service;
 	
 	private Environment env;
 	
@@ -40,26 +46,24 @@ public class OAuthServiceCreator {
 
 	@Produces
 	@Facebook
-	public OAuthService getInstanceFacebook() {
-		this.service = new ServiceBuilder()
-		.provider(FacebookApi.class)
-		.apiKey(env.get(FACEBOOK_CLIENT_ID))
+	public OAuth20Service getInstanceFacebook() {
+		final String secretState = "secret" + new Random().nextInt(999_999);
+		this.service = new ServiceBuilder(env.get(FACEBOOK_CLIENT_ID))
+		.state(secretState)
 		.apiSecret(env.get(FACEBOOK_APP_SECRET))
-				.callback(env.get("host")+env.get(FACEBOOK_REDIRECT_URI))
-		.build();
+		.callback(env.get("host")+env.get(FACEBOOK_REDIRECT_URI))
+		.build(FacebookApi.instance());
 		return service;
 	}
 	
 	@Produces
 	@Google
-	public OAuthService getInstanceGoogle() {
-		this.service = new ServiceBuilder()
-		.provider(Google2Api.class)
-		.apiKey(env.get(GOOGLE_CLIENT_ID))
+	public OAuth20Service getInstanceGoogle() {
+		this.service = new ServiceBuilder(env.get(GOOGLE_CLIENT_ID))
 		.apiSecret(env.get(GOOGLE_CLIENT_SECRET))
 		.callback(env.get("host")+env.get(GOOGLE_REDIRECT_URI))
-		.scope("https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email")
-		.build();
+		.scope("profile email openid")
+		.build(GoogleApi20.instance());
 		return service;
 	}
 }

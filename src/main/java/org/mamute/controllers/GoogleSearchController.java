@@ -26,6 +26,7 @@ public class GoogleSearchController {
 	@Get
 	public void search(String query) {
 		result.include("query", sanitizer.sanitize(query));
+		result.include("key", env.get("custom_google_search_api_key"));
 		result.include("customGoogleSearchKey", env.get("custom_google_search_key"));
 	}
 }

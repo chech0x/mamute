@@ -16,7 +16,6 @@ import org.mamute.dao.UserDAO;
 import org.mamute.factory.MessageFactory;
 import org.mamute.model.LoginMethod;
 import org.mamute.model.MethodType;
-import org.mamute.model.SanitizedText;
 import org.mamute.model.User;
 
 import com.google.common.base.Optional;
@@ -44,7 +43,7 @@ public class LoginMethodManager {
 	    	return true;
 		}
 		
-		String token = socialApi.getAccessToken().getToken();
+		String token = socialApi.getAccessToken().getAccessToken();
 		
 		User existantUser = users.findByEmail(signupInfo.getEmail());
 		if (existantUser != null) {
