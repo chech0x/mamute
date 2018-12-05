@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name : mamute-app
-          image: gcr.io/kvz-ci-sion/mamute-kvz:latest
+          image: gcr.io/kvz-ci-sion/mamute-kvz:0.8
           ports:
             - containerPort: 8080
           env:
